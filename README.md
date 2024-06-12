@@ -7,8 +7,7 @@ Contaq is my upcoming decentralized contact book app, designed to offer secure a
 
 ## 🌐 Connect with Me
 
-- [LinkedIn](https://www.linkedin.com/in/jake-palanca-549b462b) 💼
-- [GitHub](https://github.com/jakepalanca) 🖥️
+- [LinkedIn](https://www.linkedin.com/in/jakepalancab) 💼
 
 ## 🛠️ Skills
 
@@ -17,4 +16,4 @@ Contaq is my upcoming decentralized contact book app, designed to offer secure a
 - **Tools**: Firebase, Amplify
 
 ## 📫 Contact
-Feel free to reach out to me via [contact@jakepalanca.com](mailto:contact@jakepalanca.com) for any inquiries or collaborations.
+Feel free to reach out to me via [jakepalanca@protonmail.com](mailto:jakepalanca@protonmail.com) for any inquiries or collaborations.
