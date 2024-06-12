@@ -1,16 +1,20 @@
-# my_portfolio
+# 🎨 Jake Palanca's Portfolio
 
-A new Flutter project.
+Welcome to my portfolio! I'm Jake Palanca, a passionate Software Developer dedicated to building innovative and impactful applications.
 
-## Getting Started
+### 🌟 Contaq (Coming Soon!)
+Contaq is my upcoming decentralized contact book app, designed to offer secure and seamless contact management. Stay tuned for more updates!
 
-This project is a starting point for a Flutter application.
+## 🌐 Connect with Me
 
-A few resources to get you started if this is your first Flutter project:
+- [LinkedIn](https://www.linkedin.com/in/jake-palanca-549b462b) 💼
+- [GitHub](https://github.com/jakepalanca) 🖥️
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🛠️ Skills
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Languages**: Dart, Java, Javascript
+- **Frameworks**: Flutter, React Native
+- **Tools**: Firebase, Amplify
+
+## 📫 Contact
+Feel free to reach out to me via [contact@jakepalanca.com](mailto:contact@jakepalanca.com) for any inquiries or collaborations.
