@@ -25,10 +25,7 @@ class HoverButtonState extends State<HoverButton>
 
   late AnimationController _controller;
   late Animation<double> _borderAnimation;
-  late Animation<Color?> _backgroundColorAnimation;
-  late Animation<double> _iconSizeAnimation;
-  late Animation<double> _textSizeAnimation;
-  late Animation<Color?> _colorAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
@@ -44,42 +41,35 @@ class HoverButtonState extends State<HoverButton>
     );
 
     _borderAnimation = Tween<double>(begin: 0.0, end: 2.0).animate(fastCurve);
-    _backgroundColorAnimation = ColorTween(
-      begin: Colors.grey[300],
-      end: Colors.grey[200],
-    ).animate(fastCurve);
-    _iconSizeAnimation =
-        Tween<double>(begin: 14.0, end: 16.0).animate(fastCurve);
-    _textSizeAnimation =
-        Tween<double>(begin: 12.0, end: 14.0).animate(fastCurve);
-    _colorAnimation =
-        ColorTween(begin: Colors.grey[800], end: Color(0xFFFF7A9A))
-            .animate(fastCurve);
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(fastCurve);
   }
 
   void _handleHover(bool hovering) {
-    setState(() {
-      _isHovering = hovering;
-      if (hovering || _isPressed) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    });
+    if (!_isPressed) {
+      setState(() {
+        _isHovering = hovering;
+        if (hovering) {
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
+      });
+    }
   }
 
   void _handleTapDown(TapDownDetails details) {
     setState(() {
       _isPressed = true;
     });
-    _handleHover(true);
+    _controller.reverse();
   }
 
   void _handleTapUp(TapUpDetails details) {
     setState(() {
       _isPressed = false;
+      _isHovering = false;
     });
-    _handleHover(false);
+    _controller.forward();
     widget.onPressed();
   }
 
@@ -87,7 +77,7 @@ class HoverButtonState extends State<HoverButton>
     setState(() {
       _isPressed = false;
     });
-    _handleHover(false);
+    _controller.forward();
   }
 
   @override
@@ -117,55 +107,54 @@ class HoverButtonState extends State<HoverButton>
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  return Container(
-                    margin:
-                        const EdgeInsets.all(0), // No margin change on hover
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: _isHovering || _isPressed
-                            ? primaryColor
-                            : Colors.transparent,
-                        width: _borderAnimation.value,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      color: _isHovering || _isPressed
-                          ? primaryColor.withOpacity(
-                              0.1) // Slightly tinted on hover/press
-                          : buttonBackgroundColor,
-                    ),
-                    child: TextButton.icon(
-                      onPressed: widget.onPressed,
-                      icon: FaIcon(
-                        widget.icon,
-                        size: _iconSizeAnimation.value,
-                        color: _isHovering || _isPressed
-                            ? primaryColor
-                            : iconTextColor,
-                      ),
-                      label: AnimatedBuilder(
-                        animation: _textSizeAnimation,
-                        builder: (context, child) {
-                          return Text(
-                            widget.label,
-                            style: GoogleFonts.poppins(
-                              fontSize: _textSizeAnimation.value,
-                              color: _isHovering || _isPressed
-                                  ? primaryColor
-                                  : iconTextColor,
-                            ),
-                          );
-                        },
-                      ),
-                      style: TextButton.styleFrom(
-                        foregroundColor: buttonBackgroundColor,
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  return Transform.scale(
+                    scale: _isPressed ? 0.9 : (_isHovering ? 1.1 : 1.0),
+                    child: Container(
+                      margin:
+                          const EdgeInsets.all(0), // No margin change on hover
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: _isHovering || _isPressed
+                              ? primaryColor
+                              : Colors.transparent,
+                          width: _borderAnimation.value,
                         ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 12),
-                        shadowColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        color: _isHovering || _isPressed
+                            ? primaryColor.withOpacity(
+                                0.1) // Slightly tinted on hover/press
+                            : buttonBackgroundColor,
+                      ),
+                      child: TextButton.icon(
+                        onPressed: widget.onPressed,
+                        icon: FaIcon(
+                          widget.icon,
+                          size: _isPressed ? 14.0 : (_isHovering ? 16.0 : 15.0),
+                          color: _isHovering || _isPressed
+                              ? primaryColor
+                              : iconTextColor,
+                        ),
+                        label: Text(
+                          widget.label,
+                          style: GoogleFonts.poppins(
+                            fontSize:
+                                _isPressed ? 12.0 : (_isHovering ? 14.0 : 13.0),
+                            color: _isHovering || _isPressed
+                                ? primaryColor
+                                : iconTextColor,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: buttonBackgroundColor,
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 12),
+                          shadowColor: Colors.transparent,
+                        ),
                       ),
                     ),
                   );

@@ -43,7 +43,9 @@
       height: 100%;
       flex-direction: column;
       transition: opacity 1s ease-out;
-      opacity: 1;
+      opacity: 1; /* Start visible */
+      visibility: visible; /* Start visible */
+      z-index: 9999; /* Ensure it's on top */
     }
 
     .spinner {
@@ -114,14 +116,24 @@
       window.matchMedia('(prefers-color-scheme: dark)').addListener(updateMetaTags);
     }
 
-    // Fade out the loading screen when the content is loaded
-    window.addEventListener('load', function() {
+    // Show loading screen with a slight delay and then fade it out when the content is loaded
+    document.addEventListener('DOMContentLoaded', function() {
       const loadingScreen = document.getElementById('loading-screen');
+      let spinnerTimeout;
+
       if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        setTimeout(() => {
-          loadingScreen.style.display = 'none';
-        }, 600); // Match the transition duration
+        spinnerTimeout = setTimeout(() => {
+          loadingScreen.style.visibility = 'visible';
+          loadingScreen.style.opacity = '1';
+        }, 500); // Ensure spinner is visible after 0.5 seconds
+
+        window.addEventListener('load', function() {
+          clearTimeout(spinnerTimeout);
+          loadingScreen.style.opacity = '0';
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 1000); // Match the transition duration
+        });
       }
     });
   </script>
