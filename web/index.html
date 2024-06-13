@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -22,17 +9,121 @@
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="my_portfolio">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta id="apple-mobile-web-app-status-bar-style" name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta id="apple-mobile-web-app-title" name="apple-mobile-web-app-title" content="my_portfolio">
+  <link id="apple-touch-icon" rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <title>my_portfolio</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Light mode styles */
+    body {
+      background-color: #F4F1F2; /* whiteWithRedTint */
+      color: #1C1718; /* darkDarkGrey */
+      font-family: 'Arial', sans-serif;
+      transition: opacity 1s ease-out;
+      opacity: 1;
+    }
+
+    #loading-screen {
+      background-color: #F4F1F2; /* whiteWithRedTint */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: #1C1718; /* darkDarkGrey */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      transition: opacity 1s ease-out;
+      opacity: 1;
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #FF7A9A; /* primaryColor */
+      animation: spin 1s ease infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1C1718; /* darkDarkGrey */
+        color: #F4F1F2; /* whiteWithRedTint */
+      }
+
+      #loading-screen {
+        background-color: #1C1718; /* darkDarkGrey */
+        color: #F4F1F2; /* whiteWithRedTint */
+      }
+
+      .spinner {
+        border-left-color: #F4F1F2; /* whiteWithRedTint */
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- Custom loading screen -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+  </div>
+  
   <script src="flutter_bootstrap.js" async></script>
+
+  <script>
+    function updateMetaTags() {
+      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      const statusBarMetaTag = document.getElementById('apple-mobile-web-app-status-bar-style');
+      const touchIconLinkTag = document.getElementById('apple-touch-icon');
+      
+      if (isDarkMode) {
+        statusBarMetaTag.setAttribute('content', 'black-translucent');
+        touchIconLinkTag.setAttribute('href', 'icons/Icon-192-dark.png'); // Ensure you have a dark mode icon
+      } else {
+        statusBarMetaTag.setAttribute('content', 'default');
+        touchIconLinkTag.setAttribute('href', 'icons/Icon-192.png');
+      }
+    }
+
+    // Initial check
+    updateMetaTags();
+
+    // Update meta tags when the color scheme changes
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(updateMetaTags);
+    }
+
+    // Fade out the loading screen when the content is loaded
+    window.addEventListener('load', function() {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 600); // Match the transition duration
+      }
+    });
+  </script>
 </body>
 </html>

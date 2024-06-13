@@ -8,11 +8,11 @@ class HoverButton extends StatefulWidget {
   final VoidCallback onPressed;
 
   const HoverButton({
-    super.key,
+    Key? key,
     required this.icon,
     required this.label,
     required this.onPressed,
-  });
+  }) : super(key: key);
 
   @override
   HoverButtonState createState() => HoverButtonState();
@@ -21,10 +21,11 @@ class HoverButton extends StatefulWidget {
 class HoverButtonState extends State<HoverButton>
     with SingleTickerProviderStateMixin {
   bool _isHovering = false;
+  bool _isPressed = false;
 
   late AnimationController _controller;
   late Animation<double> _borderAnimation;
-  late Animation<double> _backgroundColorAnimation;
+  late Animation<Color?> _backgroundColorAnimation;
   late Animation<double> _iconSizeAnimation;
   late Animation<double> _textSizeAnimation;
   late Animation<Color?> _colorAnimation;
@@ -43,12 +44,14 @@ class HoverButtonState extends State<HoverButton>
     );
 
     _borderAnimation = Tween<double>(begin: 0.0, end: 2.0).animate(fastCurve);
-    _backgroundColorAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(fastCurve);
-    _iconSizeAnimation = Tween<double>(begin: 14.0, end: 16.0)
-        .animate(fastCurve); // 2 units increase
-    _textSizeAnimation = Tween<double>(begin: 12.0, end: 14.0)
-        .animate(fastCurve); // 2 units increase
+    _backgroundColorAnimation = ColorTween(
+      begin: Colors.grey[300],
+      end: Colors.grey[200],
+    ).animate(fastCurve);
+    _iconSizeAnimation =
+        Tween<double>(begin: 14.0, end: 16.0).animate(fastCurve);
+    _textSizeAnimation =
+        Tween<double>(begin: 12.0, end: 14.0).animate(fastCurve);
     _colorAnimation =
         ColorTween(begin: Colors.grey[800], end: Color(0xFFFF7A9A))
             .animate(fastCurve);
@@ -57,7 +60,7 @@ class HoverButtonState extends State<HoverButton>
   void _handleHover(bool hovering) {
     setState(() {
       _isHovering = hovering;
-      if (hovering) {
+      if (hovering || _isPressed) {
         _controller.forward();
       } else {
         _controller.reverse();
@@ -65,26 +68,39 @@ class HoverButtonState extends State<HoverButton>
     });
   }
 
-  void _handleTap() {
+  void _handleTapDown(TapDownDetails details) {
     setState(() {
-      _isHovering = true;
+      _isPressed = true;
     });
-    _controller.forward().then((_) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _isHovering = false;
-          });
-          _controller.reverse();
-        }
-      });
+    _handleHover(true);
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    setState(() {
+      _isPressed = false;
     });
+    _handleHover(false);
+    widget.onPressed();
+  }
+
+  void _handleTapCancel() {
+    setState(() {
+      _isPressed = false;
+    });
+    _handleHover(false);
   }
 
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final darkBackgroundColor = Colors.grey[800];
+    final lightBackgroundColor = Colors.grey[300];
+    final isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    final buttonBackgroundColor =
+        isDarkMode ? darkBackgroundColor : lightBackgroundColor;
+    final iconTextColor = isDarkMode ? Colors.white : Colors.black;
 
     return Flexible(
       child: Row(
@@ -95,63 +111,61 @@ class HoverButtonState extends State<HoverButton>
             onEnter: (_) => _handleHover(true),
             onExit: (_) => _handleHover(false),
             child: GestureDetector(
-              onTap: () {
-                _handleTap();
-                widget.onPressed();
-              },
+              onTapDown: _handleTapDown,
+              onTapUp: _handleTapUp,
+              onTapCancel: _handleTapCancel,
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
                   return Container(
-                    margin: EdgeInsets.all(
-                        _isHovering ? 4 : 0), // Margin change on hover
+                    margin:
+                        const EdgeInsets.all(0), // No margin change on hover
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: _isHovering ? primaryColor : Colors.transparent,
+                        color: _isHovering || _isPressed
+                            ? primaryColor
+                            : Colors.transparent,
                         width: _borderAnimation.value,
                       ),
                       borderRadius: BorderRadius.circular(12),
+                      color: _isHovering || _isPressed
+                          ? primaryColor.withOpacity(
+                              0.1) // Slightly tinted on hover/press
+                          : buttonBackgroundColor,
                     ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color.lerp(Colors.grey[300], backgroundColor,
-                            _backgroundColorAnimation.value),
-                        borderRadius: BorderRadius.circular(
-                            12), // Ensure same radius as outer container
+                    child: TextButton.icon(
+                      onPressed: widget.onPressed,
+                      icon: FaIcon(
+                        widget.icon,
+                        size: _iconSizeAnimation.value,
+                        color: _isHovering || _isPressed
+                            ? primaryColor
+                            : iconTextColor,
                       ),
-                      child: TextButton.icon(
-                        onPressed: widget.onPressed,
-                        icon: FaIcon(
-                          widget.icon,
-                          size: _iconSizeAnimation.value,
-                          color: _colorAnimation.value,
+                      label: AnimatedBuilder(
+                        animation: _textSizeAnimation,
+                        builder: (context, child) {
+                          return Text(
+                            widget.label,
+                            style: GoogleFonts.poppins(
+                              fontSize: _textSizeAnimation.value,
+                              color: _isHovering || _isPressed
+                                  ? primaryColor
+                                  : iconTextColor,
+                            ),
+                          );
+                        },
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: buttonBackgroundColor,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        label: AnimatedBuilder(
-                          animation: _textSizeAnimation,
-                          builder: (context, child) {
-                            return Text(
-                              widget.label,
-                              style: GoogleFonts.poppins(
-                                fontSize: _textSizeAnimation.value,
-                                color: _colorAnimation.value,
-                              ),
-                            );
-                          },
-                        ),
-                        style: TextButton.styleFrom(
-                          foregroundColor: backgroundColor,
-                          backgroundColor: Colors
-                              .transparent, // Transparent to show custom background
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(12), // Ensure same radius
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 12),
-                          shadowColor:
-                              Colors.transparent, // Ensure no shadow is applied
-                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        shadowColor: Colors.transparent,
                       ),
                     ),
                   );
