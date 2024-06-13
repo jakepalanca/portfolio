@@ -7,7 +7,7 @@ Contaq is my upcoming decentralized contact book app, designed to offer secure a
 
 ## 🌐 Connect with Me
 
-- [LinkedIn](https://www.linkedin.com/in/jakepalanca) 💼
+- [LinkedIn](https://www.linkedin.com/in/jake-palanca-549b462b1)💼
 
 ## 🛠️ Skills
 
